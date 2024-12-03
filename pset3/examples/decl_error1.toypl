@@ -1,0 +1,10 @@
+# Error message will be like "Error: k is not declared in this scope"
+
+const input:=10
+var f,n,res
+func main()
+begin
+  f <- n;
+  n <- res;
+  k <- res
+end

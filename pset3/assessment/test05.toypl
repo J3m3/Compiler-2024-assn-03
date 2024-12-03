@@ -1,0 +1,26 @@
+func main()
+var a, b
+begin
+  a <- read;
+  b <- read;
+
+  if (a < b || a == b) then
+    skip
+  else
+    skip;
+
+  if (a * b <= a + b && a < b || a /= b) then
+    skip
+  else
+    skip;
+
+  if (a > b || a < b || a >= b) then
+    skip
+  else
+    skip;
+
+  if ((a > b || a < b) && a * 3 + 1 >= b - 3) then
+    skip
+  else
+    skip;
+end

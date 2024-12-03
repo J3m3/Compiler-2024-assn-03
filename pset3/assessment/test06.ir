@@ -1,0 +1,101 @@
+:Foo.x := 1
+:Bar.Foo.x := 2
+:Bar.x := 3
+:Main.Foo.x := 4
+:Main.x := 5
+:x := 6
+:y := None
+
+func :Bar.Foo.foo(x) {
+	print x
+	t0 <- 0
+	return t0
+	print x
+}
+
+func :Main.main() {
+	a <- :Main.x
+	b <- :Main.Foo.x
+	c <- :Bar.x
+	d <- :Bar.Foo.x
+	e <- :Foo.x
+	f <- :Bar.x
+	g <- :Bar.Foo.x
+	h <- :Main.x
+	i <- :Main.Foo.x
+	j <- :y
+	k <- :x
+	l <- :y
+	t0 <- 0
+	r <- t0
+	t1 <- r + a
+	r <- t1
+	t2 <- 10
+	t3 <- r * t2
+	r <- t3
+	t4 <- r + b
+	r <- t4
+	t5 <- 10
+	t6 <- r * t5
+	r <- t6
+	t7 <- r + c
+	r <- t7
+	t8 <- 10
+	t9 <- r * t8
+	r <- t9
+	t10 <- r + d
+	r <- t10
+	t11 <- 10
+	t12 <- r * t11
+	r <- t12
+	t13 <- r + e
+	r <- t13
+	t14 <- 10
+	t15 <- r * t14
+	r <- t15
+	t16 <- r + f
+	r <- t16
+	t17 <- 10
+	t18 <- r * t17
+	r <- t18
+	t19 <- r + g
+	r <- t19
+	t20 <- 10
+	t21 <- r * t20
+	r <- t21
+	t22 <- r + h
+	r <- t22
+	t23 <- 10
+	t24 <- r * t23
+	r <- t24
+	t25 <- r + i
+	r <- t25
+	t26 <- 10
+	t27 <- r * t26
+	r <- t27
+	t28 <- r + j
+	r <- t28
+	t29 <- 10
+	t30 <- r * t29
+	r <- t30
+	t31 <- r + k
+	r <- t31
+	t32 <- 10
+	t33 <- r * t32
+	r <- t33
+	t34 <- r + l
+	r <- t34
+	_ <- call :Bar.Foo.foo(r)
+	_ <- call :Bar.Foo.foo(r)
+}
+
+func :main() {
+	t0 <- 7
+	:y <- t0
+	t1 <- :x + :x
+	a <- t1
+	t2 <- :y + :y
+	b <- t2
+	_ <- call :Main.main()
+	_ <- call :Main.main()
+}

@@ -1,0 +1,55 @@
+
+func :main() {
+	a <- read
+	b <- read
+	t0 <- a < b
+	t1 <- a == b
+	t2 <- t0 or t1
+	branch t2 L0 L1
+L0:
+	jump L2
+L1:
+	jump L2
+L2:
+	t3 <- a * b
+	t4 <- a + b
+	t5 <- t3 <= t4
+	t6 <- a < b
+	t7 <- t5 and t6
+	t8 <- a /= b
+	t9 <- t7 or t8
+	branch t9 L3 L4
+L3:
+	jump L5
+L4:
+	jump L5
+L5:
+	t10 <- a > b
+	t11 <- a < b
+	t12 <- t10 or t11
+	t13 <- a >= b
+	t14 <- t12 or t13
+	branch t14 L6 L7
+L6:
+	jump L8
+L7:
+	jump L8
+L8:
+	t15 <- a > b
+	t16 <- a < b
+	t17 <- t15 or t16
+	t18 <- 3
+	t19 <- a * t18
+	t20 <- 1
+	t21 <- t19 + t20
+	t22 <- 3
+	t23 <- b - t22
+	t24 <- t21 >= t23
+	t25 <- t17 and t24
+	branch t25 L9 L10
+L9:
+	jump L11
+L10:
+	jump L11
+L11:
+}

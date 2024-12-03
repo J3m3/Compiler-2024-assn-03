@@ -1,0 +1,6 @@
+func main()
+var x
+begin
+  x <- read;
+  print(42)
+end

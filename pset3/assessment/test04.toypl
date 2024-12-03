@@ -1,0 +1,35 @@
+func main()
+var a
+begin
+  a <- read;
+
+  if (a == a) then
+    skip
+  else
+    skip;
+
+  if (a /= a) then
+    { skip }
+  else
+    { skip };
+
+  if (3 < a) then
+    { skip; }
+  else
+    { skip; };
+
+  if (3 <= a + 3 + 4 * 5) then
+    {skip; skip}
+  else
+    {skip; skip};
+
+  if (2 + 3 + 4 + 5 > 1 + 2 + 3 + 4 + 5) then
+    {skip; skip;}
+  else
+    {skip; skip;};
+
+  if (2 + 3 + 4 + 5 >= 1 + 2 + 3 + 4 + 5) then
+    {{skip;}; {skip; skip};}
+  else
+    {{skip;}; {skip; skip};}
+end

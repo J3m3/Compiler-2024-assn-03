@@ -1,0 +1,9 @@
+# Error message will be like "Error: input cannot become a l-value since it is a const variable"
+
+const input:=10
+var f,n,res
+func main()
+begin
+  input <- n;
+  n <- res
+end

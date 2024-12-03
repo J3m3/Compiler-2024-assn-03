@@ -1,0 +1,76 @@
+namespace Foo
+  const x := 1
+end
+
+namespace Bar
+  namespace Foo
+    const x := 2
+
+    func foo(x)
+    begin
+      print(x);
+      return 0;
+      print(x);
+    end
+  end
+
+  const x := 3
+end
+
+namespace Main
+  namespace Foo
+    const x := 4
+  end
+
+  const x := 5
+
+  func main()
+  var a, b, c, d, e, f, g, h, i, j, k, l, r, _
+  begin
+    a <- x;
+    b <- Foo.x;
+    c <- Bar.x;
+    d <- Bar.Foo.x;
+
+    e <- :Foo.x;
+    f <- :Bar.x;
+    g <- :Bar.Foo.x;
+    h <- :Main.x;
+    i <- :Main.Foo.x;
+
+    j <- y;
+    k <- :x;
+    l <- :y;
+
+    r <- 0;
+    { r <- r + a; r <- r * 10
+    ; r <- r + b; r <- r * 10
+    ; r <- r + c; r <- r * 10
+    ; r <- r + d; r <- r * 10
+    ; r <- r + e; r <- r * 10
+    ; r <- r + f; r <- r * 10
+    ; r <- r + g; r <- r * 10
+    ; r <- r + h; r <- r * 10
+    ; r <- r + i; r <- r * 10
+    ; r <- r + j; r <- r * 10
+    ; r <- r + k; r <- r * 10
+    ; r <- r + l
+    };
+
+    _ <- call Bar.Foo.foo(r);
+    _ <- call :Bar.Foo.foo(r);
+  end
+end
+
+const x := 6
+var y
+
+func main()
+var a, b, _
+begin
+  y <- 7;
+  a <- :x + x;
+  b <- :y + y;
+  _ <- call Main.main();
+  _ <- call :Main.main();
+end

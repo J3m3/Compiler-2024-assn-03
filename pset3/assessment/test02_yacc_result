@@ -1,0 +1,1 @@
+('program', [], [], [], [('func', 'main', [], [], ['x'], [('read', ('rel', [], 'x')), ('print', ('number', 42))])])

@@ -1,0 +1,14 @@
+const
+  a := 10, b := 10
+
+var
+  d, e, f, g
+
+func main()
+begin
+  d <- a + b;
+  e <- d + 3 * 4 * 5 / 2;
+  f <- e + d;
+  g <- f - 2;
+end
+

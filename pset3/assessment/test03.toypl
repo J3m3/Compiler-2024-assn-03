@@ -1,0 +1,12 @@
+func main()
+const a := 1, b := 10
+var c, d, e, f, g, h
+begin
+  c <- 2;
+  d <- a + b;
+  e <- c - d;
+  f <- (c * 3);
+  g <- (c / d);
+  h <- (g + (e + c) * (2 - 4) * 5 / 10 - d);
+  print(h);
+end

@@ -1,0 +1,15 @@
+const a := 10
+var b
+
+func tester()
+begin
+  b <- b + 1
+end
+
+func main()
+var _
+begin
+  while (a > b) do {
+    _ <- call tester();
+  }
+end

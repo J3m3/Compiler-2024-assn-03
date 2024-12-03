@@ -1,0 +1,6 @@
+
+func :main() {
+	x <- read
+	t0 <- 42
+	print t0
+}

@@ -1,0 +1,133 @@
+
+func :Mod.even(n) {
+	t0 <- 0
+	t1 <- n <= t0
+	branch t1 L0 L1
+L0:
+	t2 <- 1
+	return t2
+	jump L2
+L1:
+	t3 <- 1
+	t4 <- n - t3
+	a <- call :Mod.odd(t4)
+	t5 <- 1
+	t6 <- t5 - a
+	return t6
+	jump L2
+L2:
+}
+
+func :Mod.odd(n) {
+	t0 <- 0
+	t1 <- n <= t0
+	branch t1 L0 L1
+L0:
+	t2 <- 0
+	return t2
+	jump L2
+L1:
+	t3 <- 1
+	t4 <- n - t3
+	a <- call :Mod.even(t4)
+	t5 <- 1
+	t6 <- t5 - a
+	return t6
+	jump L2
+L2:
+}
+
+func :Mod.ack(m, n) {
+	t0 <- 0
+	t1 <- m <= t0
+	branch t1 L0 L1
+L0:
+	t2 <- 1
+	t3 <- n + t2
+	return t3
+	jump L2
+L1:
+	t4 <- 0
+	t5 <- n <= t4
+	branch t5 L3 L4
+L3:
+	t6 <- 1
+	t7 <- m - t6
+	t8 <- 1
+	a <- call :Mod.ack(t7, t8)
+	return a
+	jump L5
+L4:
+	t9 <- 1
+	t10 <- n - t9
+	a <- call :Mod.ack(m, t10)
+	t11 <- 1
+	t12 <- m - t11
+	b <- call :Mod.ack(t12, a)
+	return b
+	jump L5
+L5:
+	jump L2
+L2:
+}
+
+func :Mod.fact_rec(n) {
+	t0 <- 1
+	t1 <- n <= t0
+	branch t1 L0 L1
+L0:
+	t2 <- 1
+	return t2
+	jump L2
+L1:
+	jump L2
+L2:
+	t3 <- 1
+	t4 <- n - t3
+	a <- call :Mod.fact_rec(t4)
+	t5 <- n * a
+	return t5
+}
+
+func :Mod.fact_loop(n) {
+	t0 <- 1
+	t1 <- n <= t0
+	branch t1 L0 L1
+L0:
+	t2 <- 1
+	return t2
+	jump L2
+L1:
+	jump L2
+L2:
+	t3 <- 1
+	a <- t3
+	t4 <- 1
+	i <- t4
+L3:
+	t5 <- i <= n
+	branch t5 L4 L5
+L4:
+	t6 <- i * a
+	a <- t6
+	t7 <- 1
+	t8 <- i + t7
+	i <- t8
+	jump L3
+L5:
+	return a
+}
+
+func :main() {
+	n <- read
+	r1 <- call :Mod.even(n)
+	r2 <- call :Mod.odd(n)
+	r3 <- call :Mod.ack(n, n)
+	r4 <- call :Mod.fact_rec(n)
+	r5 <- call :Mod.fact_loop(n)
+	print r1
+	print r2
+	print r3
+	print r4
+	print r5
+}

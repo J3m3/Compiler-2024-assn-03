@@ -1,0 +1,1 @@
+[LexToken(FUNC,'func',1,0), LexToken(LIDENT,'main',1,5), LexToken(LPAR,'(',1,9), LexToken(RPAR,')',1,10), LexToken(BEGIN,'begin',2,12), LexToken(SKIP,'skip',4,47), LexToken(END,'end',5,52)]

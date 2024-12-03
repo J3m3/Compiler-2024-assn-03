@@ -1,0 +1,98 @@
+:OP.add := 1
+:OP.sub := 2
+:OP.mul := 3
+:OP.div := 4
+:Calc.acc := None
+:Calc.err := None
+
+func :Calc.init() {
+	t0 <- 0
+	:Calc.acc <- t0
+	t1 <- 0
+	:Calc.err <- t1
+	return :Calc.acc
+}
+
+func :Calc.add(x) {
+	t0 <- :Calc.acc + x
+	:Calc.acc <- t0
+	return :Calc.acc
+}
+
+func :Calc.sub(x) {
+	t0 <- :Calc.acc - x
+	:Calc.acc <- t0
+	return :Calc.acc
+}
+
+func :Calc.mul(x) {
+	t0 <- :Calc.acc * x
+	:Calc.acc <- t0
+	return :Calc.acc
+}
+
+func :Calc.div(x) {
+	t0 <- 0
+	t1 <- x == t0
+	branch t1 L0 L1
+L0:
+	t2 <- 1
+	:Calc.err <- t2
+	t3 <- 0
+	return t3
+	jump L2
+L1:
+	t4 <- :Calc.acc / x
+	:Calc.acc <- t4
+	return :Calc.acc
+	jump L2
+L2:
+}
+
+func :main() {
+L0:
+	t0 <- 0
+	t1 <- 0
+	t2 <- t0 == t1
+	branch t2 L1 L2
+L1:
+	op <- read
+	x <- read
+	t3 <- op == :OP.add
+	branch t3 L3 L4
+L3:
+	r <- call :Calc.add(x)
+	jump L5
+L4:
+	t4 <- op == :OP.sub
+	branch t4 L6 L7
+L6:
+	r <- call :Calc.sub(x)
+	jump L8
+L7:
+	t5 <- op == :OP.mul
+	branch t5 L9 L10
+L9:
+	r <- call :Calc.mul(x)
+	jump L11
+L10:
+	t6 <- op == :OP.div
+	branch t6 L12 L13
+L12:
+	r <- call :Calc.div(x)
+	jump L14
+L13:
+	t7 <- 0
+	return t7
+	jump L14
+L14:
+	jump L11
+L11:
+	jump L8
+L8:
+	jump L5
+L5:
+	print r
+	jump L0
+L2:
+}

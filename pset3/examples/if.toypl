@@ -1,0 +1,16 @@
+const d := 10, e := 20
+var f
+
+func tester()
+begin
+  f <- f + 1
+end
+
+func main()
+var _
+begin
+  f <- 0;
+  if (d /= e) then
+      _ <- call tester()
+  else skip
+end
