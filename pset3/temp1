@@ -1,0 +1,31 @@
+F
+======================================================================
+FAIL: test_case6 (__main__.ParserTest.test_case6)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/j3m3/lectures/2024-2/CompilerDesign/03/pset3/resolver_test.py", line 73, in test_case6
+    check_golden(self, cases[5])
+  File "/Users/j3m3/lectures/2024-2/CompilerDesign/03/pset3/resolver_test.py", line 49, in check_golden
+    tester.assertEqual(o, o_golden)
+AssertionError: "{'gvars': {':x': 6, ':y': None, ':Foo.x': 1, ':Bar.x':[2239 chars]])}}" != "{'gvars': {':Foo.x': 1, ':Bar.Foo.x': 2, ':Bar.x': 3, [2312 chars]])}}"
+- {'gvars': {':x': 6, ':y': None, ':Foo.x': 1, ':Bar.x': 3, ':Bar.Foo.x': 2, ':Main.x': 5, ':Main.Foo.x': 4}, 'funcs': {
+  
+  ':main': ([], [], ['a', 'b', '_'], [('assign', 'y', ('number', 7)), ('assign', 'a', ('+', ('var', 'x'), ('var', 'x'))), ('assign', 'b', ('+', ('var', 'y'), ('var', 'y'))), ('call', '_', ':Main.main', []), ('call', '_', ':Main.main', [])]), 
+  
+  ':Bar.Foo.foo': (['x'], [], [], [('print', ('var', 'x')), ('return', ('number', 0)), ('print', ('var', 'x'))]), 
+  
+  ':Main.main': ([], [], ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'r', '_'], [('assign', 'a', ('var', 'x')), ('assign', 'b', ('var', 'x')), ('assign', 'c', ('var', 'x')), ('assign', 'd', ('var', 'x')), ('assign', 'e', ('var', 'x')), ('assign', 'f', ('var', 'x')), ('assign', 'g', ('var', 'x')), ('assign', 'h', ('var', 'x')), ('assign', 'i', ('var', 'x')), ('assign', 'j', ('var', 'y')), ('assign', 'k', ('var', 'x')), ('assign', 'l', ('var', 'y')), ('assign', 'r', ('number', 0)), ('stmts', [('assign', 'r', ('+', ('var', 'r'), ('var', 'a'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'b'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'c'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'd'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'e'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'f'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'g'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'h'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'i'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'j'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'k'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'l')))]), ('call', '_', ':Bar.Foo.foo', [('var', 'r')]), ('call', '_', ':Bar.Foo.foo', [('var', 'r')])])}}
+
++ {'gvars': {':Foo.x': 1, ':Bar.Foo.x': 2, ':Bar.x': 3, ':Main.Foo.x': 4, ':Main.x': 5, ':x': 6, ':y': None}, 'funcs': {
+  
+  ':Bar.Foo.foo': (['x'], [], [], [('print', ('var', 'x')), ('return', ('number', 0)), ('print', ('var', 'x'))]), 
+  
+  ':Main.main': ([], [], ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'r', '_'], [('assign', 'a', ('var', ':Main.x')), ('assign', 'b', ('var', ':Main.Foo.x')), ('assign', 'c', ('var', ':Bar.x')), ('assign', 'd', ('var', ':Bar.Foo.x')), ('assign', 'e', ('var', ':Foo.x')), ('assign', 'f', ('var', ':Bar.x')), ('assign', 'g', ('var', ':Bar.Foo.x')), ('assign', 'h', ('var', ':Main.x')), ('assign', 'i', ('var', ':Main.Foo.x')), ('assign', 'j', ('var', ':y')), ('assign', 'k', ('var', ':x')), ('assign', 'l', ('var', ':y')), ('assign', 'r', ('number', 0)), ('stmts', [('assign', 'r', ('+', ('var', 'r'), ('var', 'a'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'b'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'c'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'd'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'e'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'f'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'g'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'h'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'i'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'j'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'k'))), ('assign', 'r', ('*', ('var', 'r'), ('number', 10))), ('assign', 'r', ('+', ('var', 'r'), ('var', 'l')))]), ('call', '_', ':Bar.Foo.foo', [('var', 'r')]), ('call', '_', ':Bar.Foo.foo', [('var', 'r')])]), 
+  
+  ':main': ([], [], ['a', 'b', '_'], [('assign', ':y', ('number', 7)), ('assign', 'a', ('+', ('var', ':x'), ('var', ':x'))), ('assign', 'b', ('+', ('var', ':y'), ('var', ':y'))), ('call', '_', ':Main.main', []), ('call', '_', ':Main.main', [])])}}
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.007s
+
+FAILED (failures=1)

@@ -308,7 +308,7 @@ class Resolver:
             self.gvars[name] = None if len(var) == 1 else var[1]
 
     # TODO
-    def resolve_ident(self, ident, namespace_stack):
+    def resolve_ident(self, path_type, paths, ident, namespace_stack):
         """
         stable = (ntable, vtable, ftable)
         ntable = Map NIDENT stable
@@ -317,13 +317,13 @@ class Resolver:
 
         (
             {
-                'Foo': ({}, {'x': 'const'}, set()), 
+                'Foo': ({}, {'x': 'const'}, set()),
                 'Bar': ({'Foo': ({}, {'x': 'const'}, {'foo'})}, {'x': 'const'}, set()),
                 'Main': ({'Foo': ({}, {'x': 'const'}, set())}, {'x': 'const'}, {'main'})
             },
-            
+
             {'x': 'const', 'y': 'var'},
-            
+
             {'main'}
         )
         """
@@ -356,7 +356,9 @@ class Resolver:
                 case "call":
                     resolved_stmt[1] = stmt[1][2]
                     resolved_stmt[2] = generate_global_name(stmt[2][1], stmt[2][2])
-                    resolved_stmt[3] = [self.resolve_expr(arg, namespace_stack) for arg in stmt[3]]
+                    resolved_stmt[3] = [
+                        self.resolve_expr(arg, namespace_stack) for arg in stmt[3]
+                    ]
                     resolved_stmts.append(tuple(resolved_stmt))
                 case _:
                     resolved_stmts.append(stmt)
@@ -385,7 +387,12 @@ class Resolver:
         expr_type = expr[0]
         match expr_type:
             case "var":
-                return ("var", expr[1][2])
+                print(f"{namespace_stack}:{expr}")
+                path_type, paths, ident = expr[1]
+                return (
+                    expr_type,
+                    self.resolve_ident(path_type, paths, ident, expr[1][1]),
+                )
             case "+" | "-" | "*" | "/" | "%":
                 return (
                     expr_type,
