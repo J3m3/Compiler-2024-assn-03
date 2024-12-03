@@ -266,6 +266,7 @@ class Resolver:
         self.abs_stable = generate_program_symbol_table(ast)  # stable
         self.gvars = {}  # Map GIDENT (None | int)
         self.funcs = {}  # Map GIDENT (params, consts, vars, stmts)
+        print(self.abs_stable)
         self.traverse_ast(ast)
 
     def traverse_ast(self, ast):
@@ -291,10 +292,10 @@ class Resolver:
             var_decs = namespace[4]
             func_decs = namespace[5]
 
-            self.resolve_consts(const_decs, [name, *namespace_stack])
-            self.resolve_vars(var_decs, [name, *namespace_stack])
-            self.resolve_funcs(func_decs, [name, *namespace_stack])
-            self.resolve_namespaces(subnamespace_decs, [name, *namespace_stack])
+            self.resolve_consts(const_decs, [*namespace_stack, name])
+            self.resolve_vars(var_decs, [*namespace_stack, name])
+            self.resolve_funcs(func_decs, [*namespace_stack, name])
+            self.resolve_namespaces(subnamespace_decs, [*namespace_stack, name])
 
     def resolve_consts(self, const_decs, namespace_stack):
         for const in const_decs:
@@ -306,33 +307,56 @@ class Resolver:
             name = generate_global_name(namespace_stack, var)
             self.gvars[name] = None if len(var) == 1 else var[1]
 
-    def resolve_ident(self, ident):
+    # TODO
+    def resolve_ident(self, ident, namespace_stack):
+        """
+        stable = (ntable, vtable, ftable)
+        ntable = Map NIDENT stable
+        vtable = Map LIDENT ('const' | 'var')
+        ftable = Set LIDENT
+
+        (
+            {
+                'Foo': ({}, {'x': 'const'}, set()), 
+                'Bar': ({'Foo': ({}, {'x': 'const'}, {'foo'})}, {'x': 'const'}, set()),
+                'Main': ({'Foo': ({}, {'x': 'const'}, set())}, {'x': 'const'}, {'main'})
+            },
+            
+            {'x': 'const', 'y': 'var'},
+            
+            {'main'}
+        )
+        """
+
+        focused_stable = get_focused_symbol_table(self.abs_stable, namespace_stack)
+
         return ident
 
-    def resolve_stmts(self, stmts, resolved_stmts):
+    def resolve_stmts(self, stmts, resolved_stmts, namespace_stack):
         for stmt in stmts:
             resolved_stmt = [*stmt]
             stmt_type = stmt[0]
             match stmt_type:
                 case "stmts":
-                    return (stmt_type, self.resolve_stmts(stmt[1], resolved_stmts))
+                    resolved_substmts = self.resolve_stmts(stmt[1], [], namespace_stack)
+                    resolved_stmts.append((stmt_type, resolved_substmts))
                 case "read":
                     resolved_stmt[1] = stmt[1][2]
                     resolved_stmts.append(tuple(resolved_stmt))
                 case "assign":
                     resolved_stmt[1] = stmt[1][2]
-                    resolved_stmt[2] = self.resolve_expr(stmt[2])
+                    resolved_stmt[2] = self.resolve_expr(stmt[2], namespace_stack)
                     resolved_stmts.append(tuple(resolved_stmt))
                 case "print":
-                    resolved_stmt[1] = self.resolve_expr(stmt[1])
+                    resolved_stmt[1] = self.resolve_expr(stmt[1], namespace_stack)
                     resolved_stmts.append(tuple(resolved_stmt))
                 case "if":
-                    resolved_stmt[1] = self.resolve_expr(stmt[1])
+                    resolved_stmt[1] = self.resolve_expr(stmt[1], namespace_stack)
                     resolved_stmts.append(tuple(resolved_stmt))
                 case "call":
                     resolved_stmt[1] = stmt[1][2]
                     resolved_stmt[2] = generate_global_name(stmt[2][1], stmt[2][2])
-                    resolved_stmt[3] = [self.resolve_expr(arg) for arg in stmt[3]]
+                    resolved_stmt[3] = [self.resolve_expr(arg, namespace_stack) for arg in stmt[3]]
                     resolved_stmts.append(tuple(resolved_stmt))
                 case _:
                     resolved_stmts.append(stmt)
@@ -340,18 +364,24 @@ class Resolver:
         return resolved_stmts
 
     def resolve_funcs(self, func_decs, namespace_stack):
+        # print("---------------------")
+        # print(namespace_stack)
         for func in func_decs:
             name = generate_global_name(namespace_stack, func[1])
+            # print(name)
 
             params = func[2]
             consts = func[3]
             vars = func[4]
             stmts = func[5]
-            resolved_stmts = self.resolve_stmts(stmts, [])
+
+            # print(stmts)
+            resolved_stmts = self.resolve_stmts(stmts, [], namespace_stack)
 
             self.funcs[name] = (params, consts, vars, resolved_stmts)
+            # print(self.funcs)
 
-    def resolve_expr(self, expr):
+    def resolve_expr(self, expr, namespace_stack):
         expr_type = expr[0]
         match expr_type:
             case "var":
@@ -359,20 +389,20 @@ class Resolver:
             case "+" | "-" | "*" | "/" | "%":
                 return (
                     expr_type,
-                    self.resolve_expr(expr[1]),
-                    self.resolve_expr(expr[2]),
+                    self.resolve_expr(expr[1], namespace_stack),
+                    self.resolve_expr(expr[2], namespace_stack),
                 )
             case "or" | "and":
                 return (
                     expr_type,
-                    self.resolve_expr(expr[1]),
-                    self.resolve_expr(expr[2]),
+                    self.resolve_expr(expr[1], namespace_stack),
+                    self.resolve_expr(expr[2], namespace_stack),
                 )
             case "==" | "/=" | "<" | "<=" | ">" | ">=":
                 return (
                     expr_type,
-                    self.resolve_expr(expr[1]),
-                    self.resolve_expr(expr[2]),
+                    self.resolve_expr(expr[1], namespace_stack),
+                    self.resolve_expr(expr[2], namespace_stack),
                 )
             case _:
                 return expr
