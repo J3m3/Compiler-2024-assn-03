@@ -266,7 +266,8 @@ class Resolver:
         self.abs_stable = generate_program_symbol_table(ast)  # stable
         self.gvars = {}  # Map GIDENT (None | int)
         self.funcs = {}  # Map GIDENT (params, consts, vars, stmts)
-        print(self.abs_stable)
+        # print(self.abs_stable)
+        # print(ast)
         self.traverse_ast(ast)
 
     def traverse_ast(self, ast):
@@ -276,13 +277,10 @@ class Resolver:
         var_decs = ast[3]
         func_decs = ast[4]
 
-        ################## Handling the global namespace ##################
+        self.resolve_namespaces(namespace_decs, [])
         self.resolve_consts(const_decs, [])
         self.resolve_vars(var_decs, [])
         self.resolve_funcs(func_decs, [])
-
-        ################## Handling non-global namespaces ##################
-        self.resolve_namespaces(namespace_decs, [])
 
     def resolve_namespaces(self, namespace_decs, namespace_stack):
         for namespace in namespace_decs:
@@ -292,23 +290,26 @@ class Resolver:
             var_decs = namespace[4]
             func_decs = namespace[5]
 
+            self.resolve_namespaces(subnamespace_decs, [*namespace_stack, name])
             self.resolve_consts(const_decs, [*namespace_stack, name])
             self.resolve_vars(var_decs, [*namespace_stack, name])
             self.resolve_funcs(func_decs, [*namespace_stack, name])
-            self.resolve_namespaces(subnamespace_decs, [*namespace_stack, name])
 
     def resolve_consts(self, const_decs, namespace_stack):
         for const in const_decs:
             name = generate_global_name(namespace_stack, const[0])
+            # TODO integrate with `resolve_ident`
             self.gvars[name] = None if len(const) == 1 else const[1]
 
     def resolve_vars(self, var_decs, namespace_stack):
         for var in var_decs:
             name = generate_global_name(namespace_stack, var)
-            self.gvars[name] = None if len(var) == 1 else var[1]
+            # TODO integrate with `resolve_ident`
+            is_uninitialized = type(var) == str
+            self.gvars[name] = None if is_uninitialized else var[1]
 
     # TODO
-    def resolve_ident(self, path_type, paths, ident, namespace_stack):
+    def resolve_ident(self, path_type, paths, name, namespace_stack, func_node):
         """
         stable = (ntable, vtable, ftable)
         ntable = Map NIDENT stable
@@ -328,40 +329,99 @@ class Resolver:
         )
         """
 
-        focused_stable = get_focused_symbol_table(self.abs_stable, namespace_stack)
 
-        return ident
+        # local variable
+        # function argument
+        # If the identifier is a local variable or given as an argument,
+        # we should not do anything but just use the ident as-is.
 
-    def resolve_stmts(self, stmts, resolved_stmts, namespace_stack):
+        params = func_node[2]
+        local_consts = [i for i, _value in func_node[3]]
+        local_vars = func_node[4]
+        # print(f"local idents: {[*params, *local_consts, *local_vars]}")
+        if name in [*params, *local_consts, *local_vars]:
+            return name
+        
+        if path_type == "abs":
+            return generate_global_name(paths, name)
+
+        # print("-------------------------")
+        # print(f"path_type: {path_type}")
+        # print(f"paths: {paths}")
+        # print(f"ident: {ident}")
+        # print(f"namespace_stack: {namespace_stack}")
+
+        # print(f"params: {params}")
+        # print(f"consts: {local_consts}")
+        # print(f"vars: {local_vars}")
+
+        for pref_namespaces in get_prefix_namespaces(namespace_stack):
+            # print(f"pref_namespaces: {pref_namespaces}")
+            focused_stable = get_focused_symbol_table(self.abs_stable, pref_namespaces)
+            # print(f"focused_stable: {focused_stable}")
+
+            for p in paths:
+                focused_stable = focused_stable[0].get(p, None)
+                if focused_stable is None:
+                    break
+            else:
+                _, vtable, ftable =  focused_stable
+                if name in vtable or name in ftable:
+                    return generate_global_name([*pref_namespaces, *paths], name)
+            
+        raise Exception(f"No symbol {name} found")
+
+    def resolve_stmts(self, stmts, resolved_stmts, namespace_stack, func_node):
         for stmt in stmts:
             resolved_stmt = [*stmt]
             stmt_type = stmt[0]
             match stmt_type:
                 case "stmts":
-                    resolved_substmts = self.resolve_stmts(stmt[1], [], namespace_stack)
+                    resolved_substmts = self.resolve_stmts(stmt[1], [], namespace_stack, func_node)
                     resolved_stmts.append((stmt_type, resolved_substmts))
                 case "read":
-                    resolved_stmt[1] = stmt[1][2]
+                    path_type, paths, ident_name = stmt[1]
+                    resolved_stmt[1] = self.resolve_ident(path_type, paths, ident_name, namespace_stack, func_node)
                     resolved_stmts.append(tuple(resolved_stmt))
                 case "assign":
-                    resolved_stmt[1] = stmt[1][2]
-                    resolved_stmt[2] = self.resolve_expr(stmt[2], namespace_stack)
+                    path_type, paths, ident_name = stmt[1]
+                    resolved_stmt[1] = self.resolve_ident(path_type, paths, ident_name, namespace_stack, func_node)
+                    resolved_stmt[2] = self.resolve_expr(stmt[2], namespace_stack, func_node)
                     resolved_stmts.append(tuple(resolved_stmt))
                 case "print":
-                    resolved_stmt[1] = self.resolve_expr(stmt[1], namespace_stack)
+                    resolved_stmt[1] = self.resolve_expr(stmt[1], namespace_stack, func_node)
                     resolved_stmts.append(tuple(resolved_stmt))
                 case "if":
-                    resolved_stmt[1] = self.resolve_expr(stmt[1], namespace_stack)
+                    _, cond_expr, true_stmt, false_stmt = stmt
+                    resolved_stmt[1] = self.resolve_expr(cond_expr, namespace_stack, func_node)
+                    resolved_stmt[2] = self.resolve_stmts([true_stmt], [], namespace_stack, func_node)[0]
+                    resolved_stmt[3] = self.resolve_stmts([false_stmt], [], namespace_stack, func_node)[0]
                     resolved_stmts.append(tuple(resolved_stmt))
                 case "call":
-                    resolved_stmt[1] = stmt[1][2]
-                    resolved_stmt[2] = generate_global_name(stmt[2][1], stmt[2][2])
+                    # print(stmt)
+                    _, ret_ident, func_ident, args = stmt
+
+                    ret_path_type, ret_paths, ret_name = ret_ident
+                    resolved_stmt[1] = self.resolve_ident(ret_path_type, ret_paths, ret_name, namespace_stack, func_node)
+
+                    func_path_type, func_paths, func_name = func_ident
+                    # print(func_ident)
+                    resolved_stmt[2] = self.resolve_ident(func_path_type, func_paths, func_name, namespace_stack, func_node)
                     resolved_stmt[3] = [
-                        self.resolve_expr(arg, namespace_stack) for arg in stmt[3]
+                        self.resolve_expr(arg, namespace_stack, func_node) for arg in stmt[3]
                     ]
                     resolved_stmts.append(tuple(resolved_stmt))
+                case "return":
+                    _, expr = stmt
+                    resolved_stmt[1] = self.resolve_expr(expr, namespace_stack, func_node)
+                    resolved_stmts.append(tuple(resolved_stmt))
+                case "while":
+                    _, cond_expr, inner_stmt = stmt
+                    resolved_stmt[1] = self.resolve_expr(cond_expr, namespace_stack, func_node)
+                    resolved_stmt[2] = self.resolve_stmts([inner_stmt], [], namespace_stack, func_node)[0]
+                    resolved_stmts.append(tuple(resolved_stmt))
                 case _:
-                    resolved_stmts.append(stmt)
+                    resolved_stmts.append(tuple(resolved_stmt))
 
         return resolved_stmts
 
@@ -378,38 +438,38 @@ class Resolver:
             stmts = func[5]
 
             # print(stmts)
-            resolved_stmts = self.resolve_stmts(stmts, [], namespace_stack)
+            resolved_stmts = self.resolve_stmts(stmts, [], namespace_stack, func)
 
             self.funcs[name] = (params, consts, vars, resolved_stmts)
             # print(self.funcs)
 
-    def resolve_expr(self, expr, namespace_stack):
+    def resolve_expr(self, expr, namespace_stack, func_node):
         expr_type = expr[0]
         match expr_type:
             case "var":
-                print(f"{namespace_stack}:{expr}")
-                path_type, paths, ident = expr[1]
+                # print(f"{namespace_stack}:{expr}")
+                path_type, paths, ident_name = expr[1]
                 return (
                     expr_type,
-                    self.resolve_ident(path_type, paths, ident, expr[1][1]),
+                    self.resolve_ident(path_type, paths, ident_name, namespace_stack, func_node),
                 )
             case "+" | "-" | "*" | "/" | "%":
                 return (
                     expr_type,
-                    self.resolve_expr(expr[1], namespace_stack),
-                    self.resolve_expr(expr[2], namespace_stack),
+                    self.resolve_expr(expr[1], namespace_stack, func_node),
+                    self.resolve_expr(expr[2], namespace_stack, func_node),
                 )
             case "or" | "and":
                 return (
                     expr_type,
-                    self.resolve_expr(expr[1], namespace_stack),
-                    self.resolve_expr(expr[2], namespace_stack),
+                    self.resolve_expr(expr[1], namespace_stack, func_node),
+                    self.resolve_expr(expr[2], namespace_stack, func_node),
                 )
             case "==" | "/=" | "<" | "<=" | ">" | ">=":
                 return (
                     expr_type,
-                    self.resolve_expr(expr[1], namespace_stack),
-                    self.resolve_expr(expr[2], namespace_stack),
+                    self.resolve_expr(expr[1], namespace_stack, func_node),
+                    self.resolve_expr(expr[2], namespace_stack, func_node),
                 )
             case _:
                 return expr

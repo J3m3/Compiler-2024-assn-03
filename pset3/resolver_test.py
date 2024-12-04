@@ -54,32 +54,32 @@ class ParserTest(unittest.TestCase):
         self.maxDiff = None
         super(ParserTest, self).__init__(*args, **kwargs)
 
-    # def test_case1(self):
-    #     check_golden(self, cases[0])
+    def test_case1(self):
+        check_golden(self, cases[0])
 
-    # def test_case2(self):
-    #     check_golden(self, cases[1])
+    def test_case2(self):
+        check_golden(self, cases[1])
 
-    # def test_case3(self):
-    #     check_golden(self, cases[2])
+    def test_case3(self):
+        check_golden(self, cases[2])
 
-    # def test_case4(self):
-    #     check_golden(self, cases[3])
+    def test_case4(self):
+        check_golden(self, cases[3])
 
-    # def test_case5(self):
-    #     check_golden(self, cases[4])
+    def test_case5(self):
+        check_golden(self, cases[4])
 
     def test_case6(self):
         check_golden(self, cases[5])
 
-    # def test_case7(self):
-    #     check_golden(self, cases[6])
+    def test_case7(self):
+        check_golden(self, cases[6])
 
-    # def test_case8(self):
-    #     check_golden(self, cases[7])
+    def test_case8(self):
+        check_golden(self, cases[7])
 
-    # def test_case9(self):
-    #     check_golden(self, cases[8])
+    def test_case9(self):
+        check_golden(self, cases[8])
 
 
 if __name__ == "__main__":
